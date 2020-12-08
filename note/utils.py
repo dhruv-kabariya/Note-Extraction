@@ -56,25 +56,6 @@ def frequency_spectrum(sample, max_frequency=800):
     return freq_array, freq_magnitude
 
 
-# def classify_note_attempt_1(freq_array, freq_magnitude):
-#     i = np.argmax(freq_magnitude)
-#     f = freq_array[i]
-#     print("frequency {}".format(f))
-#     print("magnitude {}".format(freq_magnitude[i]))
-#     return get_note_for_freq(f)
-
-
-# def classify_note_attempt_2(freq_array, freq_magnitude):
-#     note_counter = Counter()
-#     for i in range(len(freq_magnitude)):
-#         if freq_magnitude[i] < 0.01:
-#             continue
-#         note = get_note_for_freq(freq_array[i])
-#         if note:
-#             note_counter[note] += freq_magnitude[i]
-#     return note_counter.most_common(1)[0][0]
-
-
 def classify_note_attempt_3(freq_array, freq_magnitude):
     min_freq = 82
     note_counter = Counter()
@@ -125,19 +106,3 @@ def get_note_for_freq(f, tolerance=33):
         if f > note_range[0] and f < note_range[1]:
             return note
     return None
-
-
-# Assumes everything is either natural or sharp, no flats
-# Returns the Levenshtein distance between the actual notes and the predicted notes
-def calculate_distance(predicted, actual):
-    # To make a simple string for distance calculations we make natural notes lower case
-    # and sharp notes cap
-    def transform(note):
-        if "#" in note:
-            return note[0].upper()
-        return note.lower()
-
-    return distance(
-        "".join([transform(n) for n in predicted]), "".join(
-            [transform(n) for n in actual]),
-    )

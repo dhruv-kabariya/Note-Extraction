@@ -12,6 +12,6 @@ class Note:
         self.display = True
 
     def updateX(self):
-        self.x -= 0.15
+        self.x -= 0.35
         if(self.x < 0):
             self.display = False

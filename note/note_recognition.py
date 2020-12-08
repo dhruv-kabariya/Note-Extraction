@@ -8,9 +8,6 @@ import matplotlib.pyplot as plt
 
 from note.utils import (
     frequency_spectrum,
-    calculate_distance,
-    # classify_note_attempt_1,
-    # classify_note_attempt_2,
     classify_note_attempt_3,
 )
 
@@ -31,7 +28,7 @@ def main(file, note_file=None, note_starts_file=None, plot_starts=False, plot_ff
 
     song = AudioSegment.from_file(file)
     song.export(file[0:-4] + ".mp3", format="mp3")
-    song = song.high_pass_filter(80, order=4)
+    song = song.high_pass_filter(80)
 
     starts, volumn, segment_ms = predict_note_starts(
         song, plot_starts, actual_starts)
@@ -39,29 +36,9 @@ def main(file, note_file=None, note_starts_file=None, plot_starts=False, plot_ff
     predicted_notes, predicted_time = predict_notes(
         song, starts, actual_notes, plot_fft_indices)
 
-    # print("")
-    # if actual_notes:
-    #     print("Actual Notes")
-    #     print(actual_notes)
-    # print("Predicted Notes")
-    # print(predicted_notes)
-
-    # if actual_notes:
-    #     lev_distance = calculate_distance(predicted_notes, actual_notes)
-    #     print("Levenshtein distance: {}/{}".format(lev_distance, len(actual_notes)))
-
     return predicted_notes, starts, volumn, segment_ms
 
 
-# Very simple implementation, just requires a minimum volume and looks for left edges by
-# comparing with the prior sample, also requires a minimum distance between starts
-# Future improvements could include smoothing and/or comparing multiple samples
-#
-# song: pydub.AudioSegment
-# plot: bool, whether to show a plot of start times
-# actual_starts: []float, time into song of each actual note start (seconds)
-#
-# Returns perdicted starts in ms
 def predict_note_starts(song, plot, actual_starts):
     # Size of segments to break song into for volume calculations
     SEGMENT_MS = 50
@@ -125,55 +102,9 @@ def predict_notes(song, starts, actual_notes, plot_fft_indices):
         predicted_notes.append(predicted or "U")
         prediction_time.append(sample_from)
 
-        # Print general info
-        # print("")
-        # print("Note: {}".format(i))
-        # if i < len(actual_notes):
-        #     print("Predicted: {} Actual: {}".format(
-        #         predicted, actual_notes[i]))
-        # else:
-        #     print("Predicted: {}".format(predicted))
-        # print("Predicted start: {}".format(start))
-        # length = sample_to - sample_from
-        # print("Sampled from {} to {} ({} ms)".format(
-        #     sample_from, sample_to, length))
-        # print("Frequency sample period: {}hz".format(freqs[1]))
-
-        # # Print peak info
-        # peak_indicies, props = scipy.signal.find_peaks(
-        #     freq_magnitudes, height=0.015)
-        # print("Peaks of more than 1.5 percent of total frequency contribution:")
-        # for j, peak in enumerate(peak_indicies):
-        #     freq = freqs[peak]
-        #     magnitude = props["peak_heights"][j]
-        #     print("{:.1f}hz with magnitude {:.3f}".format(freq, magnitude))
-
         if i in plot_fft_indices:
             plt.plot(freqs, freq_magnitudes, "b")
             plt.xlabel("Freq (Hz)")
             plt.ylabel("|X(freq)|")
             plt.show()
     return predicted_notes, prediction_time
-
-
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("file")
-#     parser.add_argument("--note-file", type=str)
-#     parser.add_argument("--note-starts-file", type=str)
-#     parser.add_argument("--plot-starts", action="store_true")
-#     parser.add_argument(
-#         "--plot-fft-index",
-#         type=int,
-#         nargs="*",
-#         help="Index of detected note to plot graph of FFT for",
-#     )
-#     args = parser.parse_args()
-#     print(args)
-#     main(
-#         args.file,
-#         note_file=args.note_file,
-#         note_starts_file=args.note_starts_file,
-#         plot_starts=args.plot_starts,
-#         plot_fft_indices=(args.plot_fft_index or []),
-#     )

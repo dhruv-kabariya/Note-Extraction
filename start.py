@@ -62,7 +62,7 @@ graph_label = Label(
 )
 graph_label.pack()
 plot(graph_frame)
-graph_frame.pack()
+# graph_frame.pack()
 
 
 # button frame buttons
